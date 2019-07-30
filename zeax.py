@@ -18,6 +18,7 @@ clientSession = ClientSession()
 
 async def requ(query_url):
     print(f"attempint to get {query_url}")
+    print(f"http://api.smmry.com&SM_API_KEY={smmry_key}&SM_URL={query_url}")
     return (await clientSession.get(f"http://api.smmry.com&SM_API_KEY={smmry_key}&SM_URL={query_url}")).json()
 
 
