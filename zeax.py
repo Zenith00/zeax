@@ -53,7 +53,7 @@ async def emb3(request: web.Request):
         "type"   : "rich",
         "version": 1.0,
         "html"   : "<div>super long text goes here super long text goes here super long text goes here super long text goes here </div>",
-        "width"  : 100,
+        "width"  : 30,
         "height" : 20,
     })
 
