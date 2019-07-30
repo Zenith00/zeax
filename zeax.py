@@ -18,7 +18,7 @@ async def emb(request: web.Request):
     return web.json_response({
         "type"   : "link",
         "version": 1.0,
-        "title"  : request.query_string
+        "title"  : ast.literal_eval(request.query_string)
     })
 
 
