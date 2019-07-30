@@ -26,7 +26,6 @@ clientSession = ClientSession(
 #     pass
 
 async def requ(query_url):
-    print(f"attempint to get {urllib.parse.quote(f'http://api.smmry.com/&SM_API_KEY={smmry_key}&SM_URL={query_url}')}")
     return await (await clientSession.get(f"http://api.smmry.com/&SM_API_KEY={smmry_key}&SM_URL={urllib.parse.quote(query_url)}")).json()
 
 
@@ -49,7 +48,6 @@ async def emb(request: web.Request):
 
 @routes.get('/bigproxy')
 async def emb3(request: web.Request):
-    req = await requ(request.query_string)
 
     return web.json_response({
         "type"   : "rich",
@@ -62,7 +60,6 @@ async def emb3(request: web.Request):
 
 @routes.get('/e2')
 async def bigembed(request: web.Request):
-    print(f"got query string {request.query_string}")
     return web.Response(text=f'<link type="application/json+oembed" href="http://ze.ax/bigproxy" />', content_type="text/html")
 
 
