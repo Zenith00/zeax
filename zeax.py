@@ -34,8 +34,8 @@ async def emb_proxy(request: web.Request):
     req = await requ(request.query_string)
     return web.Response(text=("<meta property='og:title' content='Summarized:' />\n"
                               "<meta property='og:type' content='video.movie' />\n"
-                              "<meta property='og:url' content='' />\n"
-                              "<meta property='og:image' content='' />\n"
+                              "<meta property='og:url' content='http://ze.ax/' />\n"
+                              "<meta property='og:image' content='http://ze.ax/none.png' />\n"
                               f"<meta property='og:description' content='{req['sm_api_content']}'\n"), content_type="text/html")
     # return web.json_response({
     #     "type"   : "link",
