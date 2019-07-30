@@ -1,6 +1,5 @@
 from aiohttp import web
 import ast
-
 routes = web.RouteTableDef()
 
 
@@ -21,7 +20,7 @@ async def emb(request: web.Request):
 @routes.get('/embed')
 async def emb(request: web.Request):
     print(f"got query string {request.query_string}")
-    return web.Response(text=f'<link type="application/json+oembed" href="jsonproxy?{request.query_string}" />', content_type="text/html")
+    return web.Response(text=f'<link type="application/json+oembed" href="http://ze.ax/jsonproxy?{request.query_string}" />', content_type="text/html")
 
 
 
