@@ -3,74 +3,90 @@ import socket
 import yarl
 import urllib.parse
 import ast
+import asyncio
 from TextToOwO import owo
 
-routes = web.RouteTableDef()
 from TOKENS import smmry_key
 
-clientSession = ClientSession(
-    connector=TCPConnector(
-        family=socket.AF_INET,
-        verify_ssl=False,
-        limit=1,  # or use_dns_cache=False
-    ),
-)
+routes = web.RouteTableDef()
+
+clientSession: ClientSession
 
 
-# @routes.get('/e')
-# async def eval(request: web.Request):
-#     print(request.query)
-#     print(request.query_string)
-#
-#     return web.Response(body="OK")
-#     pass
+def gen_embed(
+        title: str = "zeax",
+        og_type: str = "zeax:default",
+        url: str = "http://ze.ax",
+        image: str = None,
+        description: str = "",
+        audio_url: str = None,
+        video_url: str = None
+) -> web.Response:
+    html = (f"<meta property='og:title' content='{title}' />\n"
+            f"<meta property='og:type' content='{og_type}' />\n"
+            f"<meta property='og:url' content='{url}' />\n")
+    if image:
+        html += (f"<meta property='og:image:type' content='image/jpeg'/>\n"
+                 f"<meta property='og:image' content='{image}' />\n")
+    if description:
+        html += f"<meta property='og:description' content='{description}' />\n"
+    if audio_url:
+        html += f"<meta property='og:audio' content='{audio_url}' />\n"
+    if video_url:
+        html += f"<meta property='og:video' content='{video_url}' />\n"
 
-async def requ(query_url):
-    return await (await clientSession.get(f"http://api.smmry.com/&SM_API_KEY={smmry_key}&SM_URL={urllib.parse.quote(query_url)}")).json()
-
-
-@routes.get('/jsonproxy')
-async def emb_proxy(request: web.Request):
-    req = await requ(request.query_string)
-    return web.Response(text=("<meta property='og:title' content='Summarized:' />\n"
-                              "<meta property='og:type' content='video.movie' />\n"
-                              "<meta property='og:url' content='' />\n"
-                              "<meta property='og:image' content='' />\n"
-                              f"<meta property='og:description' content='{req['sm_api_content']}'\n"), content_type="text/html")
-    # return web.json_response({
-    #     "type"   : "link",
-    #     "version": 1.0,
-    #     "title"  : req["sm_api_content"]
-    # })
+    return web.Response(text=html, content_type="text/html")
 
 
-@routes.get('/e')
+@routes.get('/summarize')
 async def emb(request: web.Request):
-    print(f"got query string {request.query_string}")
-    return web.Response(text=f'<link type="application/json+oembed" href="http://ze.ax/jsonproxy?{request.query_string}" />', content_type="text/html")
+    async def summarize(query_string):
+        resp = await (await clientSession.get(
+            f"http://api.smmry.com/&SM_API_KEY={smmry_key}&SM_URL={urllib.parse.quote(query_string)}")).json()
+        if "sm_api_content" in resp:
+            return resp["sm_api_content"]
+        else:
+            return resp["sm_api_error"]
+
+    return gen_embed(
+        title="summary",
+        og_type="zeax:summary",
+        description=await summarize(request.query_string)
+    )
 
 
-@routes.get('/bigproxy')
-async def emb3(request: web.Request):
-
-    return web.json_response({
-        "type"   : "rich",
-        "version": 1.0,
-        "html"   : "<div>super long text goes here super long text goes here super long text goes here super long text goes here </div>",
-        "width"  : 30,
-        "height" : 20,
-    })
-
-
-@routes.get('/e2')
-async def bigembed(request: web.Request):
-    return web.Response(text=("<meta property='og:title' content='Summarized:' />\n"
-                              "<meta property='og:type' content='video.movie' />\n"
-                              "<meta property='og:url' content='' />\n"
-                              "<meta property='og:image' content='' />\n"
-                              "<meta property='og:description' content='{}'\n"), content_type="text/html")
+@routes.get('/jpegify/proxy')
+async def jpegify_proxy(request: web.Request):
+    print(f"proxy got req {request.query_string}")
+    from PIL import Image
+    import io
+    img_url = request.query_string
+    img = await clientSession.get(img_url)
+    img_ = Image.open(io.BytesIO(await img.read()))
+    buff = io.BytesIO()
+    img_.save(buff, format="JPEG", quality=1)
+    buff.seek(0)
+    return web.Response(body=buff, content_type="image/jpeg")
 
 
-app = web.Application()
-app.add_routes(routes)
-web.run_app(app, port=3300)
+@routes.get('/jpegify')
+async def jpegify(request: web.Request):
+    return gen_embed(
+        title="jpegify",
+        description="jpegified",
+        og_type="image/jpeg",
+        image=f"{request.scheme}://{request.host}/jpegify/proxy?{request.query_string}")
+
+
+async def create_session():
+    return ClientSession()
+
+
+clientSession = asyncio.get_event_loop().run_until_complete(create_session())
+
+try:
+    app = web.Application()
+    app.add_routes(routes)
+    web.run_app(app, port=3300)
+except KeyboardInterrupt:
+    clientSession.close()
