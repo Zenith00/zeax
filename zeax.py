@@ -48,6 +48,25 @@ async def emb(request: web.Request):
     return web.Response(text=f'<link type="application/json+oembed" href="http://ze.ax/jsonproxy?{request.query_string}" />', content_type="text/html")
 
 
+@routes.get('/jsonproxy2')
+async def emb(request: web.Request):
+    req = await requ(request.query_string)
+
+    return web.json_response({
+        "type"   : "rich",
+        "version": 1.0,
+        "html"  : "<div>super long text goes here super long text goes here super long text goes here super long text goes here </div>",
+        "width" : 100,
+        "height": 20,
+    })
+
+
+@routes.get('/e2')
+async def em2b(request: web.Request):
+    print(f"got query string {request.query_string}")
+    return web.Response(text=f'<link type="application/json+oembed" href="http://ze.ax/jsonproxy2" />', content_type="text/html")
+
+
 app = web.Application()
 app.add_routes(routes)
 web.run_app(app, port=3300)
