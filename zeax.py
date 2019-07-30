@@ -1,6 +1,6 @@
 from aiohttp import web
 import ast
-
+from TextToOwO import owo
 routes = web.RouteTableDef()
 
 
@@ -18,7 +18,7 @@ async def emb(request: web.Request):
     return web.json_response({
         "type"   : "link",
         "version": 1.0,
-        "title"  : ast.literal_eval(request.query_string)
+        "title"  : owo.text_to_owo(request.query_string)
     })
 
 
