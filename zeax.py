@@ -1,6 +1,7 @@
 from aiohttp import web, ClientSession, TCPConnector
 import socket
 import yarl
+import urllib.parse
 import ast
 from TextToOwO import owo
 
@@ -27,7 +28,7 @@ clientSession = ClientSession(
 
 async def requ(query_url):
     print(f"attempint to get {query_url}")
-    return (await clientSession.get(yarl.URL(f"http://api.smmry.com&SM_API_KEY={smmry_key}&SM_URL={query_url}", encoded=True))).json()
+    return (await clientSession.get(urllib.parse.quote(f"http://api.smmry.com&SM_API_KEY={smmry_key}&SM_URL={query_url}"))).json()
 
 
 @routes.get('/jsonproxy')
