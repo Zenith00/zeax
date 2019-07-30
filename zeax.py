@@ -17,7 +17,6 @@ clientSession = ClientSession(
 )
 
 
-
 # @routes.get('/e')
 # async def eval(request: web.Request):
 #     print(request.query)
@@ -49,15 +48,15 @@ async def emb(request: web.Request):
 
 
 @routes.get('/jsonproxy2')
-async def emb(request: web.Request):
+async def emb3(request: web.Request):
     req = await requ(request.query_string)
 
     return web.json_response({
         "type"   : "rich",
         "version": 1.0,
-        "html"  : "<div>super long text goes here super long text goes here super long text goes here super long text goes here </div>",
-        "width" : 100,
-        "height": 20,
+        "html"   : "<div>super long text goes here super long text goes here super long text goes here super long text goes here </div>",
+        "width"  : 100,
+        "height" : 20,
     })
 
 
