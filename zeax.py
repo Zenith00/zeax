@@ -60,7 +60,13 @@ async def emb3(request: web.Request):
 
 @routes.get('/e2')
 async def bigembed(request: web.Request):
-    return web.Response(text=f'<link type="application/json+oembed" href="http://ze.ax/bigproxy" />', content_type="text/html")
+    return web.Response(text="""
+<meta property="og:title" content="The Rock" />
+<meta property="og:type" content="video.movie" />
+<meta property="og:url" content="http://www.imdb.com/title/tt0117500/" />
+<meta property="og:image" content="http://ia.media-imdb.com/images/rock.jpg" />
+<meta property="og:description" content="super long text goes here super long text goes here super long text goes here super long text goes here " />
+""", content_type="text/html")
 
 
 app = web.Application()
