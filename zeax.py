@@ -31,7 +31,7 @@ async def requ(query_url):
 
 
 @routes.get('/jsonproxy')
-async def emb(request: web.Request):
+async def emb_proxy(request: web.Request):
     req = await requ(request.query_string)
 
     return web.json_response({
@@ -47,7 +47,7 @@ async def emb(request: web.Request):
     return web.Response(text=f'<link type="application/json+oembed" href="http://ze.ax/jsonproxy?{request.query_string}" />', content_type="text/html")
 
 
-@routes.get('/jsonproxy2')
+@routes.get('/bigproxy')
 async def emb3(request: web.Request):
     req = await requ(request.query_string)
 
@@ -61,9 +61,9 @@ async def emb3(request: web.Request):
 
 
 @routes.get('/e2')
-async def em2b(request: web.Request):
+async def bigembed(request: web.Request):
     print(f"got query string {request.query_string}")
-    return web.Response(text=f'<link type="application/json+oembed" href="http://ze.ax/jsonproxy2" />', content_type="text/html")
+    return web.Response(text=f'<link type="application/json+oembed" href="http://ze.ax/bigproxy" />', content_type="text/html")
 
 
 app = web.Application()
