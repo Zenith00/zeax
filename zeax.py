@@ -1,11 +1,18 @@
-from aiohttp import web, ClientSession
+from aiohttp import web, ClientSession, TCPConnector
+import socket
 import ast
 from TextToOwO import owo
 
 routes = web.RouteTableDef()
 from TOKENS import smmry_key
 
-clientSession = ClientSession()
+clientSession = ClientSession(
+    connector=TCPConnector(
+        family=socket.AF_INET,
+        verify_ssl=False,
+        limit=1,  # or use_dns_cache=False
+    ),
+)
 
 
 # @routes.get('/e')
