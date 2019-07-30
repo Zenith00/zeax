@@ -28,7 +28,7 @@ clientSession = ClientSession(
 
 async def requ(query_url):
     print(f"attempint to get {urllib.parse.quote(f'http://api.smmry.com/&SM_API_KEY={smmry_key}&SM_URL={query_url}')}")
-    return (await clientSession.get(f"http://api.smmry.com/&SM_API_KEY={smmry_key}&SM_URL={urllib.parse.quote(query_url)}")).json()
+    return await (await clientSession.get(f"http://api.smmry.com/&SM_API_KEY={smmry_key}&SM_URL={urllib.parse.quote(query_url)}")).json()
 
 
 @routes.get('/jsonproxy')
