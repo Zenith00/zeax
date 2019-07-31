@@ -96,7 +96,7 @@ async def convert_unit(request: web.Request):
 
     return gen_embed(
         title=f"Converting {source_unit.name} to {dest_unit.name}",
-        description=f"{conversion[0]:f}"
+        description=f"{conversion:f}"
     )
 
 
