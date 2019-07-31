@@ -91,7 +91,7 @@ async def fry(request: web.Request):
 @routes.get('/c')
 async def convert_unit(request: web.Request):
     query = request.query_string
-    source, dest = query.split("2", 1)
+    source, dest = query.split(",", 1)
     conversion, source_unit, dest_unit = unit_converter.converter.convert(source, dest)
 
     return gen_embed(
