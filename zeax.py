@@ -82,12 +82,19 @@ async def jpegify(request: web.Request):
     img_url = request.query_string
     img = await clientSession.get(img_url)
     img_ = Image.open(io.BytesIO(await img.read()))
-    return gen_embed(
-        title="jpegify",
-        description="jpegified",
-        og_type="image/jpeg",
-        image=f"{request.scheme}://{request.host}/jpegify/proxy?{request.query_string}",
-        image_size=img_.size)
+    buff = io.BytesIO()
+    img_ = img_.convert('RGB')
+    img_.save(buff, format="JPEG", quality=1)
+    buff.seek(0)
+    return web.Response(body=buff, content_type="image/jpeg")
+
+
+    # return gen_embed(
+    #     title="jpegify",
+    #     description="jpegified",
+    #     og_type="image/jpeg",
+    #     image=f"{request.scheme}://{request.host}/jpegify/proxy?{request.query_string}",
+    #     image_size=img_.size)
 
 
 async def create_session():
