@@ -5,9 +5,11 @@ import urllib.parse
 import ast
 import asyncio
 from TextToOwO import owo
-
+import deeppyer
 from TOKENS import smmry_key
 import typing as ty
+from PIL import Image
+import io
 
 routes = web.RouteTableDef()
 
@@ -60,41 +62,36 @@ async def emb(request: web.Request):
     )
 
 
-@routes.get('/jpegify/proxy')
-async def jpegify_proxy(request: web.Request):
-    print(f"proxy got req {request.query_string}")
-    from PIL import Image
-    import io
-    img_url = request.query_string
-    img = await clientSession.get(img_url)
-    img_ = Image.open(io.BytesIO(await img.read()))
-    buff = io.BytesIO()
-    img_ = img_.convert('RGB')
-    img_.save(buff, format="JPEG", quality=1)
-    buff.seek(0)
-    return web.Response(body=buff, content_type="image/jpeg")
-
-
 @routes.get('/jpegify')
 async def jpegify(request: web.Request):
-    from PIL import Image
-    import io
-    img_url = request.query_string
-    img = await clientSession.get(img_url)
-    img_ = Image.open(io.BytesIO(await img.read()))
+    img_bytes = await clientSession.get(request.query_string)
+    img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
+
     buff = io.BytesIO()
-    img_ = img_.convert('RGB')
-    img_.save(buff, format="JPEG", quality=1)
+    img.save(buff, format="JPEG", quality=1)
     buff.seek(0)
+
     return web.Response(body=buff, content_type="image/jpeg")
 
 
-    # return gen_embed(
-    #     title="jpegify",
-    #     description="jpegified",
-    #     og_type="image/jpeg",
-    #     image=f"{request.scheme}://{request.host}/jpegify/proxy?{request.query_string}",
-    #     image_size=img_.size)
+@routes.get('/fry')
+async def fry(request: web.Request):
+    img_bytes = await clientSession.get(request.query_string)
+    img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
+    img = await deeppyer.deepfry(img)
+
+    buff = io.BytesIO()
+    img.save(buff, format="JPEG", quality=1)
+    buff.seek(0)
+
+    return web.Response(body=buff, content_type="image/jpeg")
+
+
+@routes.get('/convert')
+async def convert_unit(request: web.Request):
+    query = request.query_string
+
+    return web.Response(body=buff, content_type="image/jpeg")
 
 
 async def create_session():
