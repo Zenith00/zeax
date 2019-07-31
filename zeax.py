@@ -10,6 +10,7 @@ from TOKENS import smmry_key
 import typing as ty
 from PIL import Image
 import io
+import unit_converter.converter
 
 routes = web.RouteTableDef()
 
@@ -62,7 +63,7 @@ async def emb(request: web.Request):
     )
 
 
-@routes.get('/jpegify')
+@routes.get('/jpeg')
 async def jpegify(request: web.Request):
     img_bytes = await clientSession.get(request.query_string)
     img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
@@ -87,11 +88,16 @@ async def fry(request: web.Request):
     return web.Response(body=buff, content_type="image/jpeg")
 
 
-@routes.get('/convert')
+@routes.get('/c')
 async def convert_unit(request: web.Request):
     query = request.query_string
+    source, dest = query.split("2", 1)
+    conversion, source_unit, dest_unit = unit_converter.converter.convert(source, dest)
 
-    return web.Response(body=buff, content_type="image/jpeg")
+    return gen_embed(
+        title=f"Converting {source_unit.name} to {dest_unit.name}",
+        description=f"{conversion[0]:f}"
+    )
 
 
 async def create_session():
