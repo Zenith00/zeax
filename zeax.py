@@ -7,6 +7,7 @@ import asyncio
 from TextToOwO import owo
 
 from TOKENS import smmry_key
+import typing as ty
 
 routes = web.RouteTableDef()
 
@@ -18,6 +19,7 @@ def gen_embed(
         og_type: str = "zeax:default",
         url: str = "http://ze.ax",
         image: str = None,
+        image_size: ty.Optional[ty.Tuple[int, int]] = None,
         description: str = "",
         audio_url: str = None,
         video_url: str = None
@@ -28,6 +30,9 @@ def gen_embed(
     if image:
         html += (f"<meta property='og:image:type' content='image/jpeg'/>\n"
                  f"<meta property='og:image' content='{image}' />\n")
+        if image_size:
+            html += (f"<meta property='og:image:width' content='{image_size[0]}'/>\n"
+                     f"<meta property='og:image:height' content='{image_size[1]}' />\n")
     if description:
         html += f"<meta property='og:description' content='{description}' />\n"
     if audio_url:
@@ -71,11 +76,16 @@ async def jpegify_proxy(request: web.Request):
 
 @routes.get('/jpegify')
 async def jpegify(request: web.Request):
+    from PIL import Image
+    import io
+    img_url = request.query_string
+    img = await clientSession.get(img_url)
+    img_ = Image.open(io.BytesIO(await img.read()))
     return gen_embed(
         title="jpegify",
         description="jpegified",
         og_type="image/jpeg",
-        image=f"{request.scheme}://{request.host}/jpegify/proxy?{request.query_string}")
+        image=f"{request.scheme}://{request.host}/jpegify/proxy?url={request.query_string}", image_size=img_.size)
 
 
 async def create_session():
