@@ -90,11 +90,7 @@ async def fry(request: web.Request):
 
 @routes.get('/c{tail:.*}')
 async def convert_unit(request: web.Request):
-    # query = request.query_string
-    print(request.path)
-    query = request.path[len("/c"):]
-    print("Test print", flush=True)
-    print(query, flush=True)
+    query = request.query_string
     source, dest = query.split(",", 1)
     try:
         conversion, source_unit, dest_unit = unit_converter.converter.convert(source, dest)
