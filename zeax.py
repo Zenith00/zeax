@@ -10,7 +10,7 @@ from TOKENS import smmry_key
 import typing as ty
 from PIL import Image
 import io
-import unit_converter.converter
+import unit_converter
 
 routes = web.RouteTableDef()
 
@@ -92,8 +92,12 @@ async def fry(request: web.Request):
 async def convert_unit(request: web.Request):
     query = request.query_string
     source, dest = query.split(",", 1)
-    conversion, source_unit, dest_unit = unit_converter.converter.convert(source, dest)
-
+    try:
+        conversion, source_unit, dest_unit = unit_converter.converter.convert(source, dest)
+    except unit_converter.exceptions.UnitDoesntExistError as e:
+        return gen_embed(
+            title=str(e)
+        )
     return gen_embed(
         title=f"Converting {source_unit.name} to {dest_unit.name}",
         description=f"{conversion:.2f}"
