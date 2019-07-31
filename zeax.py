@@ -69,6 +69,7 @@ async def jpegify_proxy(request: web.Request):
     img = await clientSession.get(img_url)
     img_ = Image.open(io.BytesIO(await img.read()))
     buff = io.BytesIO()
+    img_ = img_.convert('RGB')
     img_.save(buff, format="JPEG", quality=1)
     buff.seek(0)
     return web.Response(body=buff, content_type="image/jpeg")
