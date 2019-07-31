@@ -36,10 +36,18 @@ UNITS = {
     # Basic SI units
     # --------------
     'm': Unit('m', 'meter', L=1),
+    'meter': Unit('m', 'meter', L=1),
+
     'g': Unit('g', 'gram', M=1, coef=D('1E-3')),
+    'gram': Unit('g', 'gram', M=1, coef=D('1E-3')),
+
     's': Unit('s', 'second', T=1),
+    'second': Unit('s', 'second', T=1),
+
     'A': Unit('A', 'ampere', I=1),
     'K': Unit('K', 'kelvin', THETA=1),
+    'kelvin': Unit('K', 'kelvin', THETA=1),
+
     'mol': Unit('mol', 'mole', N=1),
     'cd': Unit('cd', 'candela', J=1),
 
@@ -77,15 +85,27 @@ UNITS = {
     'F': Unit('F', 'fahrenheit', THETA=1,
               offset=D('273.15') - D('32') / D('1.8'), coef=D('1') / D('1.8')),
     'thou': Unit('th', 'thou', L=1, coef=D('2.54E-5')),
+
     'inch': Unit('in', 'inch', L=1, coef=D('2.54E-2')),
+    'in': Unit('in', 'inch', L=1, coef=D('2.54E-2')),
+
     'foot': Unit('ft', 'foot', L=1, coef=D('3.048E-1')),
+    'ft': Unit('ft', 'foot', L=1, coef=D('3.048E-1')),
+
     'yard': Unit('yd', 'yard', L=1, coef=D('9.144E-1')),
+    'yd': Unit('yd', 'yard', L=1, coef=D('9.144E-1')),
+
     'chain': Unit('ch', 'chain', L=1, coef=D('20.1168')),
     'furlong': Unit('fur', 'furlong', L=1, coef=D('201.168')),
-    'mile': Unit('ml', 'mile', L=1, coef=D('1609.344')),
+
+    'mi': Unit('mi', 'mile', L=1, coef=D('1609.344')),
+    'mile': Unit('mi', 'mile', L=1, coef=D('1609.344')),
+
     'league': Unit('lea', 'league', L=1, coef=D('4828.032')),
     'floz': Unit('floz', 'fluid ounce', L=3, coef=D('2.95735e-5')),
+
     'lb': Unit('lb', 'pound', M=1, coef=D('4.5359237E-1')),
+    'pound': Unit('lb', 'pound', M=1, coef=D('4.5359237E-1')),
 
     # Miscellaneous units
     # -------------------
