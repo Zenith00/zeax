@@ -85,7 +85,8 @@ async def jpegify(request: web.Request):
         title="jpegify",
         description="jpegified",
         og_type="image/jpeg",
-        image=f"{request.scheme}://{request.host}/jpegify/proxy?url={request.query_string}", image_size=img_.size)
+        image=f"{request.scheme}://{request.host}/jpegify/proxy?{request.query_string}",
+        image_size=img_.size)
 
 
 async def create_session():
