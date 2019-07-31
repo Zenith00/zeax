@@ -88,7 +88,7 @@ async def fry(request: web.Request):
     return web.Response(body=buff, content_type="image/jpeg")
 
 
-@routes.get('/c{tail:.*}')
+@routes.get('/c')
 async def convert_unit(request: web.Request):
     query = request.query_string
     source, dest = query.split(",", 1)
