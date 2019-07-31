@@ -92,6 +92,7 @@ async def fry(request: web.Request):
 async def convert_unit(request: web.Request):
     # query = request.query_string
     query = request.path[len("/c"):]
+    print("Test print", flush=True)
     print(query, flush=True)
     source, dest = query.split(",", 1)
     try:
