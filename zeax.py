@@ -10,6 +10,9 @@ from TOKENS import smmry_key
 import typing as ty
 from PIL import Image
 import io
+from sympy import preview, init_printing
+
+# init_printing()
 import unit_converter
 
 routes = web.RouteTableDef()
@@ -47,7 +50,7 @@ def gen_embed(
 
 
 @routes.get('/summarize')
-async def emb(request: web.Request):
+async def emb(request: web.Request) -> web.Response:
     async def summarize(query_string):
         resp = await (await clientSession.get(
             f"http://api.smmry.com/&SM_API_KEY={smmry_key}&SM_URL={urllib.parse.quote(query_string)}")).json()
@@ -64,7 +67,7 @@ async def emb(request: web.Request):
 
 
 @routes.get('/jpeg')
-async def jpegify(request: web.Request):
+async def jpegify(request: web.Request) -> web.Response:
     img_bytes = await clientSession.get(request.query_string)
     img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
 
@@ -74,9 +77,20 @@ async def jpegify(request: web.Request):
 
     return web.Response(body=buff, content_type="image/jpeg")
 
+@routes.get('/tex')
+async def tex(request: web.Request) -> web.Response:
+    expr = request.query_string
+    buff = io.BytesIO()
+
+    preview(expr=f"$${expr}$$", output="png", viewer="BytesIO", outputbuffer=buff, dvioptions=["-D 300"])
+    buff.seek(0)
+
+    print(buff.getbuffer().nbytes)
+
+    return web.Response(body=buff, content_type="image/png")
 
 @routes.get('/fry')
-async def fry(request: web.Request):
+async def fry(request: web.Request) -> web.Response:
     img_bytes = await clientSession.get(request.query_string)
     img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
     img = await deeppyer.deepfry(img)
