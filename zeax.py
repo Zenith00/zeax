@@ -80,9 +80,10 @@ async def jpegify(request: web.Request) -> web.Response:
 @routes.get('/tex')
 async def tex(request: web.Request) -> web.Response:
     expr = request.query_string
+    # print(expr)
     buff = io.BytesIO()
 
-    preview(expr=f"$${expr}$$", output="png", viewer="BytesIO", outputbuffer=buff, dvioptions=["-D 300"])
+    preview(expr=f"$${expr}$$", output="png", viewer="BytesIO", outputbuffer=buff, dvioptions=["-D 150"])
     buff.seek(0)
 
     print(buff.getbuffer().nbytes)
