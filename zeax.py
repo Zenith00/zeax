@@ -11,6 +11,7 @@ import typing as ty
 from PIL import Image
 import io
 from sympy import preview, init_printing
+import cairosvg
 
 # init_printing()
 import unit_converter
@@ -76,6 +77,15 @@ async def jpegify(request: web.Request) -> web.Response:
     buff.seek(0)
 
     return web.Response(body=buff, content_type="image/jpeg")
+
+@routes.get('/svg2png')
+async def jpegify(request: web.Request) -> web.Response:
+    img_bytes = await clientSession.get(request.query_string)
+    cairo_out = io.BytesIO()
+    cairosvg.svg2png(img_bytes, write_to=cairo_out)
+
+    cairo_out.seek(0)
+    return web.Response(body=cairo_out, content_type="image/png")
 
 @routes.get('/tex')
 async def tex(request: web.Request) -> web.Response:
