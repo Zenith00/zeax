@@ -81,7 +81,7 @@ async def jpegify(request: web.Request) -> web.Response:
 async def embiggen(request: web.Request) -> web.Response:
     img_bytes = await clientSession.get(request.query_string)
     img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
-    img.thumbnail((512,512), Image.LANCZOS)
+    img = img.resize((512,512), Image.LANCZOS)
 
     buff = io.BytesIO()
     img.save(buff, format="PNG")
