@@ -81,22 +81,17 @@ async def jpegify(request: web.Request) -> web.Response:
 @routes.get('/big')
 async def embiggen(request: web.Request) -> web.Response:
     def scale(w, h, x, y, maximum=True):
-        print(f"aspect ratio {w/h}")
         nw = y * (w / h)
         nh = x * (h / w)
-        print(f"scaled to {nw} {nh}", flush=True)
         if maximum ^ (nw >= x):
             return nw or 1, y
         return int(x), int(nh) or 1
 
     img_bytes = await clientSession.get(request.query_string)
-    img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
+    img = Image.open(io.BytesIO(await img_bytes.read()))
     orig_w, orig_h = img.size
-    print(f"{orig_w},{orig_h}")
     x, y = scale(orig_w, orig_h, 256, 256, True)
-    print(f"{x},{y}", flush=True)
     img = img.resize((x, y), Image.LANCZOS)
-    img.thumbnail
     buff = io.BytesIO()
     img.save(buff, format="PNG")
     buff.seek(0)
