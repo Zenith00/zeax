@@ -81,7 +81,7 @@ async def jpegify(request: web.Request) -> web.Response:
 async def jpegify(request: web.Request) -> web.Response:
     img_bytes = await clientSession.get(request.query_string)
     img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
-    img = img.thumbnail((256,256), Image.LANCZOS)
+    img.thumbnail((256,256), Image.LANCZOS)
 
     buff = io.BytesIO()
     img.save(buff, format="PNG")
