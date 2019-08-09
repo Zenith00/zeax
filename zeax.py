@@ -78,7 +78,7 @@ async def jpegify(request: web.Request) -> web.Response:
     return web.Response(body=buff, content_type="image/jpeg")
 
 @routes.get('/big')
-async def jpegify(request: web.Request) -> web.Response:
+async def embiggen(request: web.Request) -> web.Response:
     img_bytes = await clientSession.get(request.query_string)
     img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
     img.thumbnail((256,256), Image.LANCZOS)
@@ -90,7 +90,7 @@ async def jpegify(request: web.Request) -> web.Response:
     return web.Response(body=buff, content_type="image/png")
 
 @routes.get('/svg2png')
-async def jpegify(request: web.Request) -> web.Response:
+async def svg2png(request: web.Request) -> web.Response:
     img_bytes = await (await clientSession.get(request.query_string)).read()
     cairo_out = io.BytesIO()
     cairosvg.svg2png(img_bytes, write_to=cairo_out, scale=1, parent_width=256, parent_height=256)
