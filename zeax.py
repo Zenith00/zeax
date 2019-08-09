@@ -77,26 +77,29 @@ async def jpegify(request: web.Request) -> web.Response:
 
     return web.Response(body=buff, content_type="image/jpeg")
 
+
 @routes.get('/big')
 async def embiggen(request: web.Request) -> web.Response:
+    def scale(w, h, x, y, maximum=True):
+        nw = y * w / h
+        nh = x * h / w
+        if maximum ^ (nw >= x):
+            return nw or 1, y
+        return x, nh or 1
+
     img_bytes = await clientSession.get(request.query_string)
     img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
-    size = img.size
-    x,y = size
-    if x > size[0]:
-        y = int(max(y * size[0] / x, 1))
-        x = int(size[0])
-    if y > size[1]:
-        x = int(max(x * size[1] / y, 1))
-        y = int(size[1])
+    orig_w, orig_h = img.size
+    x, y = scale(orig_w, orig_w, 256, 256, True)
 
-    img = img.resize((x,y), Image.LANCZOS)
-
+    img = img.resize((x, y), Image.LANCZOS)
+    img.thumbnail
     buff = io.BytesIO()
     img.save(buff, format="PNG")
     buff.seek(0)
 
     return web.Response(body=buff, content_type="image/png")
+
 
 @routes.get('/svg2png')
 async def svg2png(request: web.Request) -> web.Response:
@@ -106,6 +109,7 @@ async def svg2png(request: web.Request) -> web.Response:
 
     cairo_out.seek(0)
     return web.Response(body=cairo_out, content_type="image/png")
+
 
 @routes.get('/tex')
 async def tex(request: web.Request) -> web.Response:
@@ -119,6 +123,7 @@ async def tex(request: web.Request) -> web.Response:
     print(buff.getbuffer().nbytes)
 
     return web.Response(body=buff, content_type="image/png")
+
 
 @routes.get('/fry')
 async def fry(request: web.Request) -> web.Response:
