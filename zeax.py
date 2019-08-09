@@ -80,7 +80,7 @@ async def jpegify(request: web.Request) -> web.Response:
 
 @routes.get('/svg2png')
 async def jpegify(request: web.Request) -> web.Response:
-    img_bytes = await clientSession.get(request.query_string)
+    img_bytes = await (await clientSession.get(request.query_string)).read()
     cairo_out = io.BytesIO()
     cairosvg.svg2png(img_bytes, write_to=cairo_out)
 
