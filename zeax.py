@@ -85,7 +85,7 @@ async def embiggen(request: web.Request) -> web.Response:
         nh = x * h / w
         if maximum ^ (nw >= x):
             return nw or 1, y
-        return x, nh or 1
+        return int(x), int(nh) or 1
 
     img_bytes = await clientSession.get(request.query_string)
     img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
