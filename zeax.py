@@ -81,6 +81,7 @@ async def jpegify(request: web.Request) -> web.Response:
 @routes.get('/big')
 async def embiggen(request: web.Request) -> web.Response:
     def scale(w, h, x, y, maximum=True):
+        print(f"aspect ratio {w/h}")
         nw = y * (w / h)
         nh = x * (h / w)
         print(f"scaled to {nw} {nh}", flush=True)
