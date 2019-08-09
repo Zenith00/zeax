@@ -81,8 +81,8 @@ async def jpegify(request: web.Request) -> web.Response:
 @routes.get('/big')
 async def embiggen(request: web.Request) -> web.Response:
     def scale(w, h, x, y, maximum=True):
-        nw = y * w / h
-        nh = x * h / w
+        nw = y * (w / h)
+        nh = x * (h / w)
         print(f"scaled to {nw} {nh}", flush=True)
         if maximum ^ (nw >= x):
             return nw or 1, y
