@@ -90,8 +90,9 @@ async def embiggen(request: web.Request) -> web.Response:
     img_bytes = await clientSession.get(request.query_string)
     img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
     orig_w, orig_h = img.size
+    print(f"{orig_w}{orig_h}")
     x, y = scale(orig_w, orig_w, 256, 256, True)
-    print(f"{x}{y}")
+    print(f"{x}{y}", flush=True)
     img = img.resize((x, y), Image.LANCZOS)
     img.thumbnail
     buff = io.BytesIO()
