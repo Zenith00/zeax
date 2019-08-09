@@ -71,6 +71,17 @@ async def emb(request: web.Request) -> web.Response:
 async def jpegify(request: web.Request) -> web.Response:
     img_bytes = await clientSession.get(request.query_string)
     img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
+    img = img.thumbnail((256,256), Image.LANCZOS)
+    buff = io.BytesIO()
+    img.save(buff, format="PNG", quality=1)
+    buff.seek(0)
+
+    return web.Response(body=buff, content_type="image/png")
+
+@routes.get('/big')
+async def jpegify(request: web.Request) -> web.Response:
+    img_bytes = await clientSession.get(request.query_string)
+    img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
 
     buff = io.BytesIO()
     img.save(buff, format="JPEG", quality=1)
