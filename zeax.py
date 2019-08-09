@@ -82,7 +82,7 @@ async def jpegify(request: web.Request) -> web.Response:
 async def jpegify(request: web.Request) -> web.Response:
     img_bytes = await (await clientSession.get(request.query_string)).read()
     cairo_out = io.BytesIO()
-    cairosvg.svg2png(img_bytes, write_to=cairo_out, scale=1, dpi=96*3)
+    cairosvg.svg2png(img_bytes, write_to=cairo_out, scale=1, parent_width=512, parent_height=512)
 
     cairo_out.seek(0)
     return web.Response(body=cairo_out, content_type="image/png")
