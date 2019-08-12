@@ -127,7 +127,7 @@ async def tex(request: web.Request) -> web.Response:
 async def fry(request: web.Request) -> web.Response:
     img_bytes = await clientSession.get(request.query_string)
     img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
-    img = await deeppyer.deepfry(img)
+    img = await deeppyer.deepfry(img, flares=False)
 
     buff = io.BytesIO()
     img.save(buff, format="JPEG", quality=1)
