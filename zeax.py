@@ -20,6 +20,8 @@ routes = web.RouteTableDef()
 
 clientSession: ClientSession
 
+shorts = {}
+
 
 def gen_embed(
         title: str = "zeax",
@@ -116,8 +118,8 @@ async def tex(request: web.Request) -> web.Response:
     # print(expr)
     buff = io.BytesIO()
 
-    preview(expr=f"\\[\n{expr}\n\\]", output="png", viewer="BytesIO", outputbuffer=buff, dvioptions=["-D 150"],)
-            #preamble="\\documentclass[10pt]{article}\n\\usepackage{amsmath}")
+    preview(expr=f"\\[\n{expr}\n\\]", output="png", viewer="BytesIO", outputbuffer=buff, dvioptions=["-D 150"], )
+    # preamble="\\documentclass[10pt]{article}\n\\usepackage{amsmath}")
     buff.seek(0)
 
     return web.Response(body=buff, content_type="image/png")
@@ -150,6 +152,20 @@ async def convert_unit(request: web.Request):
         title=f"Converting {source_unit.name} to {dest_unit.name}",
         description=f"{conversion:.2f}"
     )
+
+
+@routes.get('/short')
+async def convert_unit(request: web.Request):
+    query = request.query_string
+    source, dest = query.split(",", 1)
+    global shorts
+    shorts[source] = dest
+
+
+@routes.get('/s/{var}')
+async def shortlink(request: web.Request):
+    link = request.match_info['var']
+    return web.HTTPFound(shorts[link])
 
 
 async def create_session():
