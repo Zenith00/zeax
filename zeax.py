@@ -111,14 +111,12 @@ async def svg2png(request: web.Request) -> web.Response:
 
 @routes.get('/tex')
 async def tex(request: web.Request) -> web.Response:
-    expr = request.query_string
+    expr = request.query_string.replace(";;", "\n")
     # print(expr)
     buff = io.BytesIO()
 
-    preview(expr=f"$${expr}$$", output="png", viewer="BytesIO", outputbuffer=buff, dvioptions=["-D 150"])
+    preview(expr=f"\\begin{{equation}}\n{expr}\n\\end{{equation}}", output="png", viewer="BytesIO", outputbuffer=buff, dvioptions=["-D 150"])
     buff.seek(0)
-
-    print(buff.getbuffer().nbytes)
 
     return web.Response(body=buff, content_type="image/png")
 
