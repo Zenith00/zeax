@@ -111,8 +111,7 @@ async def svg2png(request: web.Request) -> web.Response:
 
 @routes.get('/tex')
 async def tex(request: web.Request) -> web.Response:
-    expr = request.query_string.replace(";;", "\n")
-    expr = request.query_string.replace(",,", " ")
+    expr = request.query_string.replace(";;", "\n").replace(",,", " ")
 
     # print(expr)
     buff = io.BytesIO()
