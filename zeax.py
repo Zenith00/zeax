@@ -20,6 +20,8 @@ routes = web.RouteTableDef()
 
 clientSession: ClientSession
 
+shorts = {}
+
 
 def gen_embed(
         title: str = "zeax",
@@ -110,14 +112,14 @@ async def svg2png(request: web.Request) -> web.Response:
 
 @routes.get('/tex')
 async def tex(request: web.Request) -> web.Response:
-    expr = request.query_string
+    expr = request.query_string.replace(";;", "\n").replace(",,", " ")
+
     # print(expr)
     buff = io.BytesIO()
 
-    preview(expr=f"$${expr}$$", output="png", viewer="BytesIO", outputbuffer=buff, dvioptions=["-D 150"])
+    preview(expr=f"\\[\n{expr}\n\\]", output="png", viewer="BytesIO", outputbuffer=buff, dvioptions=["-D 150"], )
+    # preamble="\\documentclass[10pt]{article}\n\\usepackage{amsmath}")
     buff.seek(0)
-
-    print(buff.getbuffer().nbytes)
 
     return web.Response(body=buff, content_type="image/png")
 
@@ -126,7 +128,7 @@ async def tex(request: web.Request) -> web.Response:
 async def fry(request: web.Request) -> web.Response:
     img_bytes = await clientSession.get(request.query_string)
     img = Image.open(io.BytesIO(await img_bytes.read())).convert('RGB')
-    img = await deeppyer.deepfry(img)
+    img = await deeppyer.deepfry(img, flares=False)
 
     buff = io.BytesIO()
     img.save(buff, format="JPEG", quality=1)
@@ -157,6 +159,20 @@ async def serve_file(request: web.Request):
         fn = "resume.pdf"
     with pathlib.Path(f"./files/{fn}").open() as f:
         return web.Response(body=f.read(), content_type="application/pdf")
+
+
+@routes.get('/short')
+async def convert_unit(request: web.Request):
+    query = request.query_string
+    source, dest = query.split(",", 1)
+    global shorts
+    shorts[source] = dest
+
+
+@routes.get('/s/{var}')
+async def shortlink(request: web.Request):
+    link = request.match_info['var']
+    return web.HTTPFound(shorts[link])
 
 
 async def create_session():
