@@ -154,7 +154,7 @@ async def convert_unit(request: web.Request):
 
 @routes.get('/f/{filename}')
 async def serve_file(request: web.Request):
-    fn = request.match_info["name"]
+    fn = request.match_info["filename"]
     if fn == "resume":
         fn = "resume.pdf"
     with pathlib.Path(f"./files/{fn}").open() as f:
