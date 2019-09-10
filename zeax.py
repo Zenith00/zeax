@@ -12,7 +12,7 @@ from PIL import Image
 import io
 from sympy import preview, init_printing
 import cairosvg
-
+import pathlib
 # init_printing()
 import unit_converter
 
@@ -74,7 +74,6 @@ async def jpegify(request: web.Request) -> web.Response:
     buff = io.BytesIO()
     img.save(buff, format="jpeg", quality=1)
     buff.seek(0)
-
     return web.Response(body=buff, content_type="image/jpeg")
 
 
@@ -150,6 +149,14 @@ async def convert_unit(request: web.Request):
         title=f"Converting {source_unit.name} to {dest_unit.name}",
         description=f"{conversion:.2f}"
     )
+
+@routes.get('/f/{filename}')
+async def serve_file(request: web.Request):
+    fn = request.match_info["name"]
+    if fn == "resume":
+        fn = "resume.pdf"
+    with pathlib.Path(f"./files/{fn}").open() as f:
+        return web.Response(body=f.read(), content_type="application/pdf")
 
 
 async def create_session():
