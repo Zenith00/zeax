@@ -157,7 +157,7 @@ async def serve_file(request: web.Request):
     fn = request.match_info["filename"]
     if fn == "resume":
         fn = "resume.pdf"
-    with pathlib.Path(f"./files/{fn}").open() as f:
+    with pathlib.Path(f"./files/{fn}").open("rb") as f:
         return web.Response(body=f.read(), content_type="application/pdf")
 
 
