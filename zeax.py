@@ -15,6 +15,7 @@ import cairosvg
 import pathlib
 # init_printing()
 import unit_converter
+import ssl
 
 routes = web.RouteTableDef()
 
@@ -174,6 +175,33 @@ async def shortlink(request: web.Request):
     link = request.match_info['var']
     return web.HTTPFound(shorts[link])
 
+@routes.get('/t/{var}')
+async def shortlink(request: web.Request):
+    v = request.match_info['var']
+
+    d = {"fish":"""
+def mergeLists(a, b):
+    c = []
+    while a and b:
+        if a[len(a) - 1] > b[len(b) - 1]:
+            c.append(a.pop())
+        else:
+            c.append(b.pop())
+    return (c + a[::-1] + b[::-1])[::-1]
+
+
+def merge_sort(m):
+    if len(m) <= 1:
+        return m
+
+    middle_index = len(m) // 2
+
+    return list(mergeLists(
+        merge_sort(m[:middle_index]),
+        merge_sort(m[middle_index:])
+    ))
+"""}
+    return gen_embed(v, description=d[v])
 
 async def create_session():
     return ClientSession()
