@@ -118,7 +118,7 @@ async def tex(request: web.Request) -> web.Response:
     # print(expr)
     buff = io.BytesIO()
     preamble="\\documentclass[10pt]{standalone}\n\\usepackage{amsmath}\n"
-    expr = "\\begin{document}" + expr + "\\end{document}"
+    expr = "\\begin{document}\n%\n" + expr + "%\n\\end{document}"
 
     preview(expr=expr, output="png", viewer="BytesIO", outputbuffer=buff, dvioptions=["-D 300"], preamble=preamble)
     buff.seek(0)
