@@ -162,6 +162,10 @@ async def serve_file(request: web.Request):
     with pathlib.Path(f"./files/{fn}").open("rb") as f:
         return web.Response(body=f.read(), content_type="application/pdf")
 
+@routes.get('/s/{staticfile}')
+async def serve_file(request: web.Request):
+    fn = request.match_info["staticfile"]
+    return web.FileResponse(f"./static/{fn}.html")
 
 @routes.get('/short')
 async def convert_unit(request: web.Request):
