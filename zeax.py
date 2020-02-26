@@ -156,7 +156,7 @@ async def convert_unit(request: web.Request):
   document.execCommand('copy');
   document.body.removeChild(el);
 };
-copyToClipboard("abcdefg");
+copyToClipboard('abcdefg');
 "></body>"""
                         , content_type='text/html')
 
