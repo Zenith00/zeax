@@ -145,32 +145,32 @@ async def convert_unit(request: web.Request):
 
     return web.Response(
         text=
-        """
-<html>
-<style>
-.button {
-  background-color: #f1f1f1; /* Green */
-  width: 100%;
-  height: 100%;
-}
-</style>
-<script>
-  const copyToClipboard = str => {
-    const el = document.createElement('textarea');
-    el.value = str;
-    document.body.appendChild(el);
-    el.select();
-    document.execCommand('copy');
-    document.body.removeChild(el);
-    var win = window.open("","_self"); /* url = "" or "about:blank"; target="_self" */
-    win.close();
-  };
-</script>
-<body>
-<button class='button' onclick="copyToClipboard('abcd')"> Click me! </button> 
-</body>
-
-</html>"""
+        ("\n"
+         "<html>\n"
+         "<style>\n"
+         ".button {\n"
+         "  background-color: #f1f1f1; /* Green */\n"
+         "  width: 100%;\n"
+         "  height: 100%;\n"
+         "  font-size: 30px;\n"
+         "  \n"
+         "}\n"
+         "</style>\n"
+         "<script>\n"
+         "  const copyToClipboard = str => {\n"
+         "    const el = document.createElement('textarea');\n"
+         "    el.value = str;\n"
+         "    document.body.appendChild(el);\n"
+         "    el.select();\n"
+         "    document.execCommand('copy');\n"
+         "    document.body.removeChild(el);\n"
+         "  };\n"
+         "</script>\n"
+         "<body>\n"
+         "<button class='button' onclick=\"copyToClipboard('{expr}')\"> Click me! </button> \n"
+         "</body>\n"
+         "\n"
+         "</html>").format(expr=expr)
         , content_type='text/html')
 
 
