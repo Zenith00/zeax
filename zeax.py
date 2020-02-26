@@ -117,7 +117,7 @@ async def tex(request: web.Request) -> web.Response:
 
     # print(expr)
     buff = io.BytesIO()
-    preamble="\\documentclass[10pt]{standalone}\n\\usepackage{amsmath}\n"
+    preamble = "\\documentclass[10pt]{standalone}\n\\usepackage{amsmath}\n"
     expr = "\\begin{document} \\begin{equation}" + expr + " \\end{equation} \\end{document}"
     print(expr, flush=True)
     preview(expr=expr, output="png", viewer="BytesIO", outputbuffer=buff, dvioptions=["-D 300"], preamble=preamble)
@@ -139,6 +139,28 @@ async def fry(request: web.Request) -> web.Response:
     return web.Response(body=buff, content_type="image/jpeg")
 
 
+@routes.get('/copy')
+async def convert_unit(request: web.Request):
+    expr = request.query_string
+
+    return web.Response(text=
+                        """<body onload=
+"const copyToClipboard = str => {
+  const el = document.createElement('textarea');
+  el.value = str;
+  el.setAttribute('readonly', '');
+  el.style.position = 'absolute';
+  el.style.left = '-9999px';
+  document.body.appendChild(el);
+  el.select();
+  document.execCommand('copy');
+  document.body.removeChild(el);
+};
+copyToClipboard("abcdefg");
+"></body>"""
+                        , content_type='text/html')
+
+
 @routes.get('/c')
 async def convert_unit(request: web.Request):
     query = request.query_string
@@ -153,6 +175,7 @@ async def convert_unit(request: web.Request):
         title=f"Converting {source_unit.name} to {dest_unit.name}",
         description=f"{conversion:.2f}"
     )
+
 
 @routes.get('/f/{filename}')
 async def serve_file(request: web.Request):
@@ -176,11 +199,12 @@ async def shortlink(request: web.Request):
     link = request.match_info['var']
     return web.HTTPFound(shorts[link])
 
+
 @routes.get('/t/{var}')
 async def shortlink(request: web.Request):
     v = request.match_info['var']
 
-    d = {"fish":"""
+    d = {"fish": """
 def mergeLists(a, b):
     c = []
     while a and b:
@@ -203,6 +227,7 @@ def merge_sort(m):
     ))
 """}
     return gen_embed(v, description=d[v])
+
 
 async def create_session():
     return ClientSession()
