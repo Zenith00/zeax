@@ -143,22 +143,34 @@ async def fry(request: web.Request) -> web.Response:
 async def convert_unit(request: web.Request):
     expr = request.query_string
 
-    return web.Response(text=
-                        """<body onload=
-"const copyToClipboard = str => {
-  const el = document.createElement('textarea');
-  el.value = str;
-  el.setAttribute('readonly', '');
-  el.style.position = 'absolute';
-  el.style.left = '-9999px';
-  document.body.appendChild(el);
-  el.select();
-  document.execCommand('copy');
-  document.body.removeChild(el);
-};
-copyToClipboard('abcdefg');
-"></body>"""
-                        , content_type='text/html')
+    return web.Response(
+        text=
+        """
+        <html>
+<style>
+.button {
+  background-color: #f1f1f1; /* Green */
+  width: 100%;
+  height: 100%;
+}
+</style>
+<script>
+  const copyToClipboard = str => {
+    const el = document.createElement('textarea');
+    el.value = str;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    window.close();
+  };
+</script>
+<body>
+<button class='button' onclick="copyToClipboard('abcd')"> Click me! </button> 
+</body>
+
+</html>"""
+        , content_type='text/html')
 
 
 @routes.get('/c')
@@ -185,10 +197,12 @@ async def serve_file(request: web.Request):
     with pathlib.Path(f"./files/{fn}").open("rb") as f:
         return web.Response(body=f.read(), content_type="application/pdf")
 
+
 @routes.get('/st/{staticfile}')
 async def serve_file(request: web.Request):
     fn = request.match_info["staticfile"]
     return web.FileResponse(f"./static/{fn}.html")
+
 
 @routes.get('/short')
 async def convert_unit(request: web.Request):
