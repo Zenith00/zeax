@@ -166,9 +166,9 @@ async def convert_unit(request: web.Request):
             "  };"
             "</script>"
             "<body>"
-            "<button class='button' onclick=\"copyToClipboard('{expr}')\"> Click me! </button>"
+            f"<button class='button' onclick=\"copyToClipboard('{expr}')\"> Click me! </button>"
             "</body>"
-            "</html>").format(expr=expr)
+            "</html>")
         , content_type='text/html')
 
 
