@@ -146,7 +146,7 @@ async def convert_unit(request: web.Request):
     return web.Response(
         text=
         """
-        <html>
+<html>
 <style>
 .button {
   background-color: #f1f1f1; /* Green */
@@ -162,7 +162,8 @@ async def convert_unit(request: web.Request):
     el.select();
     document.execCommand('copy');
     document.body.removeChild(el);
-    window.close();
+    var win = window.open("","_self"); /* url = "" or "about:blank"; target="_self" */
+    win.close();
   };
 </script>
 <body>
