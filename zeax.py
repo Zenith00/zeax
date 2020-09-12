@@ -5,7 +5,6 @@ import urllib.parse
 import ast
 import asyncio
 from TextToOwO import owo
-import deeppyer
 from TOKENS import smmry_key
 import typing as ty
 from PIL import Image
@@ -13,6 +12,7 @@ import io
 from sympy import preview, init_printing
 import cairosvg
 import pathlib
+from functools import reduce
 # init_printing()
 import unit_converter
 import ssl
@@ -24,33 +24,43 @@ clientSession: ClientSession
 shorts = {}
 
 
-def gen_embed(
+async def gen_embed(
         title: str = "zeax",
         og_type: str = "zeax:default",
-        url: str = "http://ze.ax",
-        image: str = None,
+        url: str = "http://x.ze.ax",
+        image_url: str = None,
         image_size: ty.Optional[ty.Tuple[int, int]] = None,
         description: str = "",
         audio_url: str = None,
         video_url: str = None
 ) -> web.Response:
-    html = (f"<meta property='og:title' content='{title}' />\n"
-            f"<meta property='og:type' content='{og_type}' />\n"
-            f"<meta property='og:url' content='{url}' />\n")
-    if image:
-        html += (f"<meta property='og:image:type' content='image/jpeg'/>\n"
-                 f"<meta property='og:image' content='{image}' />\n")
+    head = f"<head>"
+    body = f"<body>"
+    if description and len(description) > 200:
+        async with clientSession.post("https://h.ze.ax/documents", data=description) as resp:
+            description = (await resp.json(content_type=None))["key"]
+
+    head += (f"<meta property='og:title' content='{title}' />\n"
+             f"<meta property='og:type' content='{og_type}' />\n"
+             f"<meta property='og:url' content='{url}' />\n")
+    if image_url:
+        head += (f"<meta property='og:image:type' content='image/jpeg'/>\n"
+                 f"<meta property='og:image' content='{image_url}' />\n"
+                 f"<meta property='twitter:image' content='{image_url}' />\n"
+                 f"<meta property='twitter:card' content='summary_large_image'>")
+        body += f"<img src='{image_url}'/>"
         if image_size:
-            html += (f"<meta property='og:image:width' content='{image_size[0]}'/>\n"
+            head += (f"<meta property='og:image:width' content='{image_size[0]}'/>\n"
                      f"<meta property='og:image:height' content='{image_size[1]}' />\n")
     if description:
-        html += f"<meta property='og:description' content='{description}' />\n"
+        head += f"<meta property='og:description' content='{description}' />\n"
     if audio_url:
-        html += f"<meta property='og:audio' content='{audio_url}' />\n"
+        head += f"<meta property='og:audio' content='{audio_url}' />\n"
     if video_url:
-        html += f"<meta property='og:video' content='{video_url}' />\n"
-
-    return web.Response(text=html, content_type="text/html")
+        head += f"<meta property='og:video' content='{video_url}' />\n"
+    head += "</head>"
+    body += "</body>"
+    return web.Response(text=head + body, content_type="text/html")
 
 
 @routes.get('/summarize')
@@ -63,7 +73,7 @@ async def emb(request: web.Request) -> web.Response:
         else:
             return resp["sm_api_error"]
 
-    return gen_embed(
+    return await gen_embed(
         title="summary",
         og_type="zeax:summary",
         description=await summarize(request.query_string)
@@ -111,19 +121,46 @@ async def svg2png(request: web.Request) -> web.Response:
     return web.Response(body=cairo_out, content_type="image/png")
 
 
-@routes.get('/tex')
-async def tex(request: web.Request) -> web.Response:
-    expr = request.query_string.replace(";;", "\n").replace(",,", " ")
-
+def texify(raw_tex, math):
+    TL = {
+        "[\\n]":"\n",
+        "[\\s]":" ",
+        "[\\and]":"&"
+    }
+    expr = reduce(lambda x, y: x.replace(y, TL[y]), TL, raw_tex)
+    print(math)
     # print(expr)
     buff = io.BytesIO()
-    preamble = "\\documentclass[10pt]{standalone}\n\\usepackage{amsmath}\n"
-    # expr = "\\begin{document} \\begin{equation}\n" + expr + " \\end{equation} \\end{document}"
+    if math:
+        preamble = "\\documentclass[border=2pt]{standalone}\n\\usepackage{amsmath}\n"
+        expr = "\\begin{document}\n$\\displaystyle\n" + expr + "\n$\n\\end{document}"
+    else:
+        preamble = "\\documentclass[10pt]{standalone}\n"
+        expr = "\\begin{document}\n" + expr + "\n\\end{document}"
 
-    preview(expr=expr, output="png", viewer="BytesIO", outputbuffer=buff, dvioptions=["-D 300"], preamble=preamble)
+    print(expr)
+    preview(expr=expr, output="png", viewer="BytesIO", outputbuffer=buff, dvioptions=["-D 600"], preamble=preamble)
+
     buff.seek(0)
+    return buff
 
-    return web.Response(body=buff, content_type="image/png")
+    # return web.Response(body=buff, content_type="image/png")
+
+
+@routes.get('/texraw')
+async def texraw(request: web.Request) -> web.Response:
+    return web.Response(body=texify(request.query["q"], math=request.query["m"] == "t" if "m" in request.query else True), content_type="image/png")
+
+
+@routes.get('/tex')
+async def tex(request: web.Request) -> web.Response:
+    print("TEX!")
+    return await gen_embed(
+        title="Tex Magicks",
+        description=f"Math Mode: {request.query['m'] == 't'}\nTex:\n{request.query['q']}",
+        image_url=f"https://x.ze.ax{request.raw_path.replace('/tex', '/texraw')}",
+        # image_size=dims
+    )
 
 
 @routes.get('/fry')
@@ -179,10 +216,10 @@ async def convert_unit(request: web.Request):
     try:
         conversion, source_unit, dest_unit = unit_converter.converter.convert(source, dest)
     except unit_converter.exceptions.UnitDoesntExistError as e:
-        return gen_embed(
+        return await gen_embed(
             title=str(e)
         )
-    return gen_embed(
+    return await gen_embed(
         title=f"Converting {source_unit.name} to {dest_unit.name}",
         description=f"{conversion:.2f}"
     )
@@ -243,7 +280,7 @@ def merge_sort(m):
         merge_sort(m[middle_index:])
     ))
 """}
-    return gen_embed(v, description=d[v])
+    return await gen_embed(v, description=d[v])
 
 
 async def create_session():
@@ -255,6 +292,6 @@ clientSession = asyncio.get_event_loop().run_until_complete(create_session())
 try:
     app = web.Application()
     app.add_routes(routes)
-    web.run_app(app, port=3300)
+    web.run_app(app, port=10007)
 except KeyboardInterrupt:
     clientSession.close()
